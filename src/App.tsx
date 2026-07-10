@@ -1,12 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import TaskItem from './TaskItem';
 import type { Task } from './types';
 import './App.css';
 
+const STORAGE_KEY = 'task-board:tasks';
+
+function loadTasks(): Task[] {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (!stored) return [];
+  try {
+    return JSON.parse(stored) as Task[];
+  } catch {
+    return [];
+  }
+}
+
 function App() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(loadTasks);
   const [text, setText] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }, [tasks]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
